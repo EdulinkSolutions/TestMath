@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form 1 Math Learning App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f2f7; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for longer content */
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 1rem; /* Padding for mobile view */
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 960px; /* Wider container for more content */
+            width: 100%;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .main-title {
+            color: #00796b; /* Dark cyan for main titles */
+            font-weight: 700;
+            font-size: 2.5rem; /* Larger title */
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            color: #004d40; /* Even darker cyan for section titles */
+            font-weight: 600;
+            font-size: 1.75rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .text-content {
+            color: #333;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        .highlight {
+            background-color: #b2dfdb; /* Light teal highlight */
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+            font-weight: 500;
+        }
+        .code-block {
+            background-color: #f0f4f8;
+            border-left: 4px solid #00796b;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.95rem;
+            color: #2d3748;
+            overflow-x: auto;
+        }
+        .action-button {
+            background-color: #00796b; /* Teal button */
+            color: #ffffff;
+            padding: 0.8rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block; /* Allow text-align to center */
+            text-align: center;
+            width: auto;
+        }
+        .action-button:hover {
+            background-color: #004d40; /* Darker teal on hover */
+            transform: translateY(-1px);
+        }
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Number Line Specific Styles */
+        #numberLineContainer {
+            position: relative;
+            width: 100%;
+            height: 80px;
+            background-color: #e0f2f7;
+            border-radius: 1rem;
+            margin-top: 1.5rem;
+            overflow: hidden; /* Hide parts of line outside */
+            cursor: grab;
+            display: flex;
+            align-items: center;
+        }
+        #numberLine {
+            position: absolute;
+            height: 4px;
+            background-color: #00796b;
+            left: 0;
+            right: 0;
+        }
+        .tick-mark {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background-color: #00796b;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        .tick-label {
+            position: absolute;
+            font-size: 0.9rem;
+            color: #004d40;
+            top: 60%;
+            transform: translateX(-50%);
+            z-index: 1;
+            font-weight: 600;
+        }
+        #pointer {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #d32f2f; /* Red triangle */
+            bottom: 50%; /* Adjust to point to the line */
+            transform: translate(-50%, 0);
+            z-index: 2;
+        }
+        #currentValueDisplay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffeb3b; /* Yellow background */
+            padding: 0.3rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 3;
+        }
+
+        /* Practice Section */
+        .practice-question {
+            background-color: #e8f5e9; /* Light green for questions */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1b5e20; /* Dark green */
+            margin-bottom: 1rem;
+        }
+        .answer-input {
+            border: 2px solid #81c784; /* Green border */
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+        .answer-input:focus {
+            outline: none;
+            border-color: #388e3c; /* Darker green on focus */
+        }
+        .feedback-message {
+            margin-top: 1rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .feedback-correct {
+            background-color: #c8e6c9; /* Light green for correct */
+            color: #2e7d32; /* Dark green text */
+        }
+        .feedback-incorrect {
+            background-color: #ffcdd2; /* Light red for incorrect */
+            color: #d32f2f; /* Dark red text */
+        }
+
+        /* Fraction Visualizer */
+        #fractionVisualizer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+            height: 100px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #ccc;
+        }
+        .fraction-segment {
+            background-color: #64b5f6; /* Light blue for filled parts */
+            height: 100%;
+            border-right: 1px solid #ffffff; /* White line between segments */
+            box-sizing: border-box;
+        }
+        .fraction-segment.empty {
+            background-color: #e3f2fd; /* Very light blue for empty parts */
+        }
+        #fractionDisplay {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1976d2;
+            margin-top: 10px;
+            text-align: center;
+        }
+        /* Mobile adjustments for the container padding */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .main-title {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .text-content {
+                font-size: 1rem;
+            }
+            .action-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">Aplikasi Pembelajaran Matematik Tingkatan 1</h1>
+        <p class="text-center text-content text-gray-700">
+            Pilih topik di bawah untuk memulakan pembelajaran interaktif!
+            (Choose a topic below to start interactive learning!)
+        </p>
+
+        <!-- Topic Selection Section -->
+        <div id="topicSelection" class="flex flex-wrap justify-center gap-4 p-4 rounded-xl shadow-inner bg-blue-50">
+            <button class="action-button topic-button" data-topic="integers">Integer</button>
+            <button class="action-button topic-button" data-topic="fractions">Pecahan (Fractions)</button>
+            <!-- Add more topic buttons here as you expand -->
+            <p class="text-gray-600 text-center mt-2 w-full">(More topics coming soon!)</p>
+        </div>
+
+        <!-- Content Area where modules will be rendered -->
+        <div id="contentArea" class="mt-4">
+            <!-- Dynamic content will be loaded here -->
+            <p class="text-center text-content text-gray-600">
+                Sila pilih satu topik daripada senarai di atas.
+                (Please select a topic from the list above.)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const contentArea = document.getElementById('contentArea');
+        const topicButtons = document.querySelectorAll('.topic-button');
+
+        // --- Global Helper Functions for Modules ---
+
+        // Function to create common HTML elements for a module
+        function createModuleSection(title, description) {
+            const section = document.createElement('div');
+            section.className = 'bg-white p-6 rounded-xl shadow-md';
+            section.innerHTML = `
+                <h2 class="section-title">${title}</h2>
+                <p class="text-center text-content text-gray-700 mb-4">${description}</p>
+                <div id="moduleContent" class="flex flex-col gap-6"></div>
+            `;
+            return section;
+        }
+
+        // Function to create a practice question section
+        function createPracticeSection() {
+            return `
+                <div class="practice-question">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Latihan (Practice)</h3>
+                    <p class="question-text mb-3" id="questionText"></p>
+                    <input type="number" id="answerInput" class="answer-input" placeholder="Enter your answer">
+                    <button id="checkAnswerBtn" class="action-button mt-4">Check Answer</button>
+                    <div id="feedbackMessage" class="feedback-message hidden"></div>
+                    <button id="nextQuestionBtn" class="action-button mt-4 hidden">Next Question</button>
+                </div>
+            `;
+        }
+
+        // Common logic for practice questions
+        function setupPracticeQuestions(questions) {
+            const questionText = document.getElementById('questionText');
+            const answerInput = document.getElementById('answerInput');
+            const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+
+            let currentQuestionIndex = 0;
+
+            function displayQuestion() {
+                answerInput.value = '';
+                feedbackMessage.classList.add('hidden');
+                feedbackMessage.textContent = '';
+                nextQuestionBtn.classList.add('hidden');
+                checkAnswerBtn.classList.remove('hidden');
+
+                const q = questions[currentQuestionIndex];
+                questionText.textContent = q.q; // The question should ideally include English hint if needed
+            }
+
+            checkAnswerBtn.onclick = () => {
+                const userAnswer = parseInt(answerInput.value);
+                const correctAnswer = questions[currentQuestionIndex].ans;
+
+                feedbackMessage.classList.remove('hidden');
+                if (userAnswer === correctAnswer) {
+                    feedbackMessage.textContent = 'Betul! Syabas! (Correct! Well done!)';
+                    feedbackMessage.className = 'feedback-message feedback-correct';
+                } else {
+                    feedbackMessage.textContent = `Salah. Jawapan yang betul ialah ${correctAnswer}. Cuba lagi! (Incorrect. The correct answer is ${correctAnswer}. Try again!)`;
+                    feedbackMessage.className = 'feedback-message feedback-incorrect';
+                }
+                checkAnswerBtn.classList.add('hidden');
+                nextQuestionBtn.classList.remove('hidden');
+            };
+
+            nextQuestionBtn.onclick = () => {
+                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                displayQuestion();
+            };
+
+            displayQuestion(); // Initial display
+        }
+
+        // --- Module 1: Integers (Integer) ---
+        function renderIntegersModule() {
+            contentArea.innerHTML = ''; // Clear previous content
+            const moduleSection = createModuleSection(
+                'Matematik Tingkatan 1: Integer',
+                'Aplikasi ini akan membantu anda memahami konsep integer dengan mudah melalui penerangan visual dan latihan interaktif.'
+            );
+            contentArea.appendChild(moduleSection);
+            const moduleContent = moduleSection.querySelector('#moduleContent');
+
+            moduleContent.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="section-title text-xl">1. Apakah itu Integer? (What are Integers?)</h3>
+                    <p class="text-content mb-4">
+                        Integer ialah <span class="highlight">nombor bulat positif, nombor bulat negatif, dan sifar (0)</span>.
+                        Integer tidak termasuk pecahan atau perpuluhan.
+                        (Integers are <span class="highlight">positive whole numbers, negative whole numbers, and zero (0)</span>.
+                        Integers do not include fractions or decimals.)
+                    </p>
+                    <p class="text-content mb-4">
+                        Contoh Integer: <span class="highlight">..., -3, -2, -1, 0, 1, 2, 3, ...</span>
+                        (Examples of Integers: <span class="highlight">..., -3, -2, -1, 0, 1, 2, 3, ...</span>)
+                    </p>
+                    <div class="code-block">
+                        <p><strong>Nombor Positif:</strong> Lebih besar daripada sifar (0). Ada tanda '+' atau tiada tanda.</p>
+                        <p>Contoh: +1, 5, 100</p>
+                        <p><strong>Nombor Negatif:</strong> Lebih kecil daripada sifar (0). Mesti ada tanda '-'.</p>
+                        <p>Contoh: -1, -5, -100</p>
+                        <p><strong>Sifar (0):</strong> Bukan positif dan bukan negatif.</p>
+                    </div>
+                    <p class="text-content mt-4">
+                        (<strong>Positive Numbers:</strong> Greater than zero (0). Has a '+' sign or no sign.
+                        Examples: +1, 5, 100.
+                        <strong>Negative Numbers:</strong> Less than zero (0). Must have a '-' sign.
+                        Examples: -1, -5, -100.
+                        <strong>Zero (0):</strong> Neither positive nor negative.)
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="section-title text-xl">2. Garis Nombor Interaktif (Interactive Number Line)</h3>
+                    <p class="text-content mb-4">
+                        Gunakan garis nombor ini untuk memvisualkan integer. Anda boleh seret (drag) garis nombor ini. Anak panah merah menunjukkan nilai semasa.
+                        (Use this number line to visualize integers. You can drag this number line. The red arrow shows the current value.)
+                    </p>
+                    <div id="numberLineContainer" class="relative">
+                        <div id="numberLine"></div>
+                        <div id="pointer"></div>
+                        <div id="currentValueDisplay">0</div>
+                    </div>
+                    <div class="mt-4 flex flex-col sm:flex-row justify-center gap-4">
+                        <button id="addFiveBtn" class="action-button px-6 py-3 text-lg">+ 5</button>
+                        <button id="minusFiveBtn" class="action-button px-6 py-3 text-lg">- 5</button>
+                        <button id="resetLineBtn" class="action-button px-6 py-3 text-lg">Reset</button>
+                    </div>
+                </div>
+
+                ${createPracticeSection()}
+            `;
+
+            // --- Number Line Specific Logic (Re-initialize after HTML is rendered) ---
+            const numberLineContainer = document.getElementById('numberLineContainer');
+            const numberLine = document.getElementById('numberLine');
+            const pointer = document.getElementById('pointer');
+            const currentValueDisplay = document.getElementById('currentValueDisplay');
+            const addFiveBtn = document.getElementById('addFiveBtn');
+            const minusFiveBtn = document.getElementById('minusFiveBtn');
+            const resetLineBtn = document.getElementById('resetLineBtn');
+
+            let isDragging = false;
+            let startX;
+            let scrollLeft;
+            let currentPointerValue = 0; // The actual integer value the pointer is on
+            const scale = 20; // Pixels per unit
+            const range = 50; // Range from -range to +range
+            const totalWidth = range * 2 * scale; // Total pixel width of the conceptual number line
+
+            function drawNumberLine() {
+                numberLine.innerHTML = ''; // Clear existing ticks/labels
+                numberLine.style.width = `${totalWidth}px`;
+                numberLine.style.left = `calc(50% - ${totalWidth / 2}px)`; // Center the huge line
+
+                for (let i = -range; i <= range; i++) {
+                    const tick = document.createElement('div');
+                    tick.classList.add('tick-mark');
+                    tick.style.left = `${(i + range) * scale}px`;
+                    numberLine.appendChild(tick);
+
+                    if (i % 5 === 0) { // Label every 5 units
+                        const label = document.createElement('div');
+                        label.classList.add('tick-label');
+                        label.textContent = i;
+                        label.style.left = `${(i + range) * scale}px`;
+                        numberLine.appendChild(label);
+                    }
+                }
+                updatePointerPosition();
+            }
+
+            function updatePointerPosition() {
+                const containerCenter = numberLineContainer.offsetWidth / 2;
+                const currentLineCenterOffset = (totalWidth / 2) - numberLineContainer.scrollLeft;
+                const pointerPixelPosition = (currentPointerValue * scale) + currentLineCenterOffset;
+
+                pointer.style.left = `${pointerPixelPosition}px`;
+                currentValueDisplay.style.left = `${pointerPixelPosition}px`;
+                currentValueDisplay.textContent = currentPointerValue;
+            }
+
+            function initNumberLine() {
+                drawNumberLine();
+                numberLineContainer.scrollLeft = (totalWidth / 2) - (numberLineContainer.offsetWidth / 2);
+                currentPointerValue = 0;
+                updatePointerPosition();
+            }
+
+            numberLineContainer.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - numberLineContainer.offsetLeft;
+                scrollLeft = numberLineContainer.scrollLeft;
+                numberLineContainer.style.cursor = 'grabbing';
+            });
+
+            numberLineContainer.addEventListener('mouseleave', () => {
+                isDragging = false;
+                numberLineContainer.style.cursor = 'grab';
+            });
+
+            numberLineContainer.addEventListener('mouseup', () => {
+                isDragging = false;
+                numberLineContainer.style.cursor = 'grab';
+                const currentOffsetFromCenter = (numberLineContainer.scrollLeft - (totalWidth / 2) + (numberLineContainer.offsetWidth / 2));
+                currentPointerValue = Math.round(currentOffsetFromCenter / scale);
+                updatePointerPosition();
+            });
+
+            numberLineContainer.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - numberLineContainer.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                numberLineContainer.scrollLeft = scrollLeft - walk;
+
+                const currentOffsetFromCenter = (numberLineContainer.scrollLeft - (totalWidth / 2) + (numberLineContainer.offsetWidth / 2));
+                currentPointerValue = Math.round(currentOffsetFromCenter / scale);
+                updatePointerPosition();
+            });
+
+            addFiveBtn.onclick = () => {
+                currentPointerValue += 5;
+                const targetScrollLeft = (currentPointerValue * scale) + (totalWidth / 2) - (numberLineContainer.offsetWidth / 2);
+                numberLineContainer.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+                updatePointerPosition();
+            };
+
+            minusFiveBtn.onclick = () => {
+                currentPointerValue -= 5;
+                const targetScrollLeft = (currentPointerValue * scale) + (totalWidth / 2) - (numberLineContainer.offsetWidth / 2);
+                numberLineContainer.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+                updatePointerPosition();
+            };
+
+            resetLineBtn.onclick = initNumberLine;
+
+            initNumberLine();
+            window.addEventListener('resize', initNumberLine); // Redraw on resize
+
+            // --- Practice Questions for Integers ---
+            const integerQuestions = [
+                { q: "Apakah integer yang berada 3 unit ke kanan dari 0? (What integer is 3 units to the right of 0?)", ans: 3 },
+                { q: "Apakah integer yang berada 5 unit ke kiri dari 0? (What integer is 5 units to the left of 0?)", ans: -5 },
+                { q: "Selesaikan: 2 + (-4) = ? (Solve: 2 + (-4) = ?)", ans: -2 },
+                { q: "Selesaikan: -3 + 7 = ? (Solve: -3 + 7 = ?)", ans: 4 },
+                { q: "Selesaikan: -5 - (-2) = ? (Solve: -5 - (-2) = ?)", ans: -3 }, // -5 + 2 = -3
+                { q: "Integer manakah yang lebih kecil: -7 atau -2? (Which integer is smaller: -7 or -2?)", ans: -7 },
+                { q: "Integer manakah yang lebih besar: -1 atau 5? (Which integer is larger: -1 or 5?)", ans: 5 }
+            ];
+            setupPracticeQuestions(integerQuestions);
+        }
+
+        // --- Module 2: Fractions (Pecahan) ---
+        function renderFractionsModule() {
+            contentArea.innerHTML = ''; // Clear previous content
+            const moduleSection = createModuleSection(
+                'Matematik Tingkatan 1: Pecahan',
+                'Terokai konsep pecahan dengan visual yang mudah difahami dan latihan interaktif.'
+            );
+            contentArea.appendChild(moduleSection);
+            const moduleContent = moduleSection.querySelector('#moduleContent');
+
+            moduleContent.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="section-title text-xl">1. Apakah itu Pecahan? (What are Fractions?)</h3>
+                    <p class="text-content mb-4">
+                        Pecahan mewakili <span class="highlight">sebahagian daripada keseluruhan</span>. Ia terdiri daripada pengangka (nombor atas) dan penyebut (nombor bawah).
+                        (Fractions represent <span class="highlight">a part of a whole</span>. They consist of a numerator (top number) and a denominator (bottom number).)
+                    </p>
+                    <div class="code-block">
+                        <p><strong>Pengangka (Numerator):</strong> Berapa banyak bahagian yang anda ada.</p>
+                        <p><strong>Penyebut (Denominator):</strong> Jumlah keseluruhan bahagian.</p>
+                        <p>Contoh: 1/2 (satu perdua) bermakna 1 bahagian daripada 2 bahagian keseluruhan.</p>
+                    </div>
+                    <p class="text-content mt-4">
+                        (<strong>Numerator:</strong> How many parts you have.
+                        <strong>Denominator:</strong> The total number of parts.
+                        Example: 1/2 (one half) means 1 part out of 2 total parts.)
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="section-title text-xl">2. Visualisasi Pecahan (Fraction Visualization)</h3>
+                    <p class="text-content mb-4">
+                        Masukkan pengangka dan penyebut untuk melihat pecahan secara visual.
+                        (Enter numerator and denominator to see the fraction visually.)
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-4">
+                        <input type="number" id="numeratorInput" class="input-field w-24 text-center" placeholder="Pengangka (Numerator)" value="1" min="0">
+                        <span class="text-2xl font-bold">/</span>
+                        <input type="number" id="denominatorInput" class="input-field w-24 text-center" placeholder="Penyebut (Denominator)" value="2" min="1">
+                        <button id="drawFractionBtn" class="action-button px-6 py-3 text-lg">Lukis Pecahan (Draw Fraction)</button>
+                    </div>
+                    <div id="fractionVisualizer"></div>
+                    <div id="fractionDisplay">1/2</div>
+                </div>
+
+                ${createPracticeSection()}
+            `;
+
+            // --- Fraction Visualizer Logic ---
+            const numeratorInput = document.getElementById('numeratorInput');
+            const denominatorInput = document.getElementById('denominatorInput');
+            const drawFractionBtn = document.getElementById('drawFractionBtn');
+            const fractionVisualizer = document.getElementById('fractionVisualizer');
+            const fractionDisplay = document.getElementById('fractionDisplay');
+
+            function drawFraction() {
+                const numerator = parseInt(numeratorInput.value);
+                let denominator = parseInt(denominatorInput.value);
+
+                if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
+                    fractionVisualizer.innerHTML = '<p class="text-red-500">Invalid input</p>';
+                    fractionDisplay.textContent = '';
+                    return;
+                }
+                // Ensure numerator does not exceed denominator
+                if (numerator > denominator && denominator !== 0) {
+                    numeratorInput.value = denominator;
+                    numerator = denominator;
+                }
+                if (denominator < 1) { // Denominator must be at least 1
+                    denominatorInput.value = 1;
+                    denominator = 1;
+                }
+
+
+                fractionVisualizer.innerHTML = '';
+                const segmentWidth = 100 / denominator; // Percentage width for each segment
+
+                for (let i = 0; i < denominator; i++) {
+                    const segment = document.createElement('div');
+                    segment.style.width = `${segmentWidth}%`;
+                    segment.className = `fraction-segment ${i >= numerator ? 'empty' : ''}`;
+                    fractionVisualizer.appendChild(segment);
+                }
+                fractionDisplay.textContent = `${numerator}/${denominator}`;
+            }
+
+            drawFractionBtn.onclick = drawFraction;
+            numeratorInput.onchange = drawFraction;
+            denominatorInput.onchange = drawFraction;
+
+            drawFraction(); // Initial draw for fractions module
+
+            // --- Practice Questions for Fractions ---
+            const fractionQuestions = [
+                { q: "Apakah pecahan yang menunjukkan 1 bahagian daripada 4 bahagian keseluruhan? (What fraction shows 1 part out of 4 total parts?)", ans: 0.25 },
+                { q: "Selesaikan: 1/2 + 1/4 = ? (Sebagai perpuluhan) (Solve: 1/2 + 1/4 = ? (As a decimal))", ans: 0.75 },
+                { q: "Selesaikan: 3/5 - 1/5 = ? (Sebagai perpuluhan) (Solve: 3/5 - 1/5 = ? (As a decimal))", ans: 0.4 },
+                { q: "Tukarkan 0.5 kepada pecahan. (Sebagai pengangka) (Convert 0.5 to a fraction. (As numerator for 1/2))", ans: 1 }, // Simplistic for now, assume 1/2
+                { q: "Pecahan manakah yang setara dengan 2/4? (Sebagai pengangka for 1/2) (Which fraction is equivalent to 2/4? (As numerator for 1/2))", ans: 1 },
+            ];
+            // Override setupPracticeQuestions to handle decimal answers for fractions for simplicity
+            const originalSetupPracticeQuestions = setupPracticeQuestions;
+            setupPracticeQuestions = (questions) => {
+                const questionText = document.getElementById('questionText');
+                const answerInput = document.getElementById('answerInput');
+                const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+                const feedbackMessage = document.getElementById('feedbackMessage');
+                const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+
+                let currentQuestionIndex = 0;
+
+                function displayQuestion() {
+                    answerInput.value = '';
+                    feedbackMessage.classList.add('hidden');
+                    feedbackMessage.textContent = '';
+                    nextQuestionBtn.classList.add('hidden');
+                    checkAnswerBtn.classList.remove('hidden');
+
+                    const q = questions[currentQuestionIndex];
+                    questionText.textContent = q.q;
+                }
+
+                checkAnswerBtn.onclick = () => {
+                    const userAnswer = parseFloat(answerInput.value); // Use parseFloat for decimals
+                    const correctAnswer = questions[currentQuestionIndex].ans;
+
+                    feedbackMessage.classList.remove('hidden');
+                    // Use a small tolerance for floating point comparisons
+                    if (Math.abs(userAnswer - correctAnswer) < 0.0001) {
+                        feedbackMessage.textContent = 'Betul! Syabas! (Correct! Well done!)';
+                        feedbackMessage.className = 'feedback-message feedback-correct';
+                    } else {
+                        feedbackMessage.textContent = `Salah. Jawapan yang betul ialah ${correctAnswer}. Cuba lagi! (Incorrect. The correct answer is ${correctAnswer}. Try again!)`;
+                        feedbackMessage.className = 'feedback-message feedback-incorrect';
+                    }
+                    checkAnswerBtn.classList.add('hidden');
+                    nextQuestionBtn.classList.remove('hidden');
+                };
+
+                nextQuestionBtn.onclick = () => {
+                    currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                    displayQuestion();
+                };
+
+                displayQuestion();
+            };
+            setupPracticeQuestions(fractionQuestions);
+        }
+
+        // --- Main App Logic (Topic Switching) ---
+        topicButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const topic = button.dataset.topic;
+                switch (topic) {
+                    case 'integers':
+                        renderIntegersModule();
+                        break;
+                    case 'fractions':
+                        renderFractionsModule();
+                        break;
+                    // Add more cases for other topics here
+                    default:
+                        contentArea.innerHTML = `<p class="text-center text-content text-red-500">
+                            Modul untuk topik ini belum tersedia.
+                            (Module for this topic is not yet available.)
+                        </p>`;
+                }
+            });
+        });
+
+        // Optional: Load a default module on page load, or show a welcome message
+        // renderIntegersModule(); // Uncomment to load Integers by default
+    </script>
+</body>
+</html>
